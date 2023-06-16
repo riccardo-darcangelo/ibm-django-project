@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'onlinecourse:index' %}">Home</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
+            <li>
+                <a class="btn btn-link" href="#">{{ user.first_name }} ({{ user.username }})</a>
+                <a class="btn btn-link" href="{% url 'onlinecourse:logout' %}">Logout</a>
+            </li>
+            {% else %}
+            <li>
+                <form class="form-inline" action="{% url 'onlinecourse:login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Username" name="username">
+                        <input type="password" class="form-control" placeholder="Password" name="psw">
+                        <button class="btn btn-primary" type="submit">Login</button>
+                        <a class="btn btn-link" href="{% url 'onlinecourse:registration' %}">Sign Up</a>
+                    </div>
+                </form>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    {% if grade > 80 %}
+    <div class="alert alert-success">
+        <h4 class="alert-heading">Congratulations!</h4>
+        <p class="mb-0">You have passed the exam with a score of {{ total_score }} out of {{ total_grade }}.</p>
+    </div>
+    {% else %}
+    <div class="alert alert-danger">
+        <h4 class="alert-heading">Exam Result</h4>
+        <p class="mb-0">Unfortunately, you have failed the exam with a score of {{ total_score }} out of {{ total_grade }}.</p>
+    </div>
+    <a class="btn btn-link text-danger" href="{% url 'onlinecourse:course_details' course.id %}">Retake Exam</a>
+    {% endif %}
+    
+    <div class="card-columns mt-3">
+        <h5 class="card-title">Exam Results</h5>
+        {% for result in question_results %}
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2">{{ result.question.question_text }}</h6>
+                {% if result.is_correct %}
+                <p class="card-text text-success">Your answer is correct.</p>
+                {% else %}
+                <p class="card-text text-danger">Your answer is incorrect.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>
